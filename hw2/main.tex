@@ -1,0 +1,42 @@
+\documentclass{article}
+\input{preamble}
+
+\begin{document}
+\maketitle
+  
+\ZS{Task 1}
+  \BV{
+    \item
+      For each node $u$ in the tree, let $f_u$ represent the desired product. We compute the product via a post-order traversal of the tree. Then,
+      \BE{
+        f_u=\bpa{x_u\cdot\prod_{v\in\text{children}(u)} f_v} \bmod M
+      }
+      The total complexity is $O(n+\sum_u \bnm{\text{children}(u)})=O(n)$ time, as desired.
+
+    \item
+      WLOG, let $n$ be a power of two. We construct a binary tree over the array by merging adjacent elements, yielding a $2n-1$ nodes in total in $\log n$ layers, where the original array is represented in the leaves of the tree. Each intermediate node is labelled with the product of its two children. \\
+
+      Each update affects the $log n$ ancestors in this tree; these can be recomputed in $O(\log n)$ time. We take the modulus for each intermediate product to keep values in the range $[0,M)$. The product of the entire array is the value stored in the root node.
+  }
+
+\ZS{Task 2}
+  Let the state $f_{u,i,b}$ where $u\in\calT$, $i\in [k]$, $b\in \{0,1\}$ represent the maximum $i$-independent set in the subtree of $u$. If $b=0$, then this set may not contain $u$. \\
+
+  For a given $u$, we compute all values of $f_{u,*,*}$ by iterating over its children $v:=v_1,\dots,v_{c_u}$ in some arbitrary order. Initially, $f_{u,*,*}=0$. We perform the following updates for all $i\in[0,k]$:
+  \BA{
+    f_{u,i,0}&:=\max_{j\in[0,i]} (f_{v,j,1} + f_{u,i-j,0}) \\
+    f_{u,i,1}&:=\max_{j\in[0,i]} (f_{v,j,0} + f_{u,i-j,1})
+  }
+  Following iterating over the children, we perform the additional update
+  \BA{
+    f_{u,i,1}:=\max(f_{u,i,0}, f_{u,i-1,1}+w_u)
+  }
+  for $i:= k,\dots,1$. We can compute these via a post-order traversal which guarentees the children of $u$ are evaluated before $u$. The answer is given by $f_{r,k,1}$, where $r$ is the root.\\
+
+  There are $O(nk)$ states and each transition takes $O(k^2\sum_u c_u)=O(k^2)$, so the total complexity is $O(nk^3)$.
+
+\ZS{Task 3}
+  Reindex the array so that the array is sorted in by the first coordinate, breaking ties with larger second coordinate. This can be done with a standard sorting algorithm in $O(n\log n)$. We then iterate through the array, maintaining a vairable $b^*$ tracking the smallest second coordinate seen so far. Initially, $b^*:=\infty$.  
+
+  A point $(a_j,b_j)$ exists for point $(a_i,b_i)$ if $b_i>b^*$. Then, we perform the update $b^*:=\min(b^*,b_i)$. This iteration can be done in $O(n)$ time. Thus, the total time complexity is $O(n\log n)$, dominated by sorting.
+\end{document}

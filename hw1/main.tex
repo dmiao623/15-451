@@ -1,0 +1,40 @@
+\documentclass{article}
+\input{preamble}
+
+\begin{document}
+\maketitle
+  
+\ZS{Problem 1}  
+  Let $f_{l,r}$ represent the minimum score over all binary trees for indices $[l,r]$:
+  \BE{
+    f_{l,r}=\min_{T\text{ is a binary tree}} \sum_{i\in[l,r]} \text{depth}_T(i)\cdot w_i.
+  }
+  To evaluate $f_{l,r}$, assume that we have already computed $f_{l',r'}$ for all $l\leq l'\leq r'\leq r$, $(l',r')\neq (l,r)$. Suppose we root the BST at some index $k\in [l,r]$, which sets indices $[l,k)$ as the left subtree and $(k,r]$ as the right subtree. This is captured by the state $f_{l,k-1}$ and $f_{k+1,r}$, respectively, and because each of the depths increase by $1$, we increment the total. Thus, the transitions are given by
+  \BA{
+    f_{i,j}
+    &=\min_{k\in [l,r]} f_{l,k-1}+f_{k+1,r}+\sum_{i\in [l,r]\setminus {k}} w_i \\
+    &=\bpa{\sum_{i\in[l,r]} w_i}+ \min_{k\in [l,r]} f_{l,k-1}+f_{k+1,r}- w_k
+  }
+  We assume that $f_{l,r}$ for $l>r$ is $0$. The base states are the trivial binary trees for each state: $f_{i,i}=w_i$. Because there are $O(n^2)$ states and each state takes $O(n)$ to evaluate (both to compute the sum and the min), this algorithm runs in $O(n^3)$.
+
+\ZS{Problem 2}
+  Suppose for $1\leq i\leq n$, that item $i$ has weight $w_i$ ($x\leq w_i\leq x+k$) and positive value $v_i$. Let $f_{k,j,s}$ represent the maximum value over the first $k$ items, having taken $j$ items with total weight $s+jx$. We have that $0\leq j\leq k\leq n$ and $0\leq x\leq nk$, with base case $f_{0,0,0}=0$ and $f_{0,0,s}=-\infty$ for $s> 0$. \\
+  
+  In each step, we may choose to include or exclude item $i$. In the former case, this corresponds to increasing $j$ by $1$ and increasing $s$ by $w_i-x$. These are captured by the transitions,
+  \BE{
+    f_{k,j,s}=\max(f_{k-1,j,s},f_{j-1,j-1,s-(w_i-x)}+v_i). 
+  }
+The answer is simply the maximum value over all states $f_{i,j,s}$ s.t. $s+jx\leq W$, which can be computed by looping over all entries. There are $n\cdot n\cdot nk$ states and each transition takes constant time, so the total complexity is $O(n^3k)$. 
+
+\ZS{Problem 3}
+  Denote the values to be $a_i$ for $i\in [n]$. Let $f_{k,s}$ represent the sum over all subsets of $a_i$ for $i\in [k]$ that sum to $s$, where $0\leq k\leq n$ and $0\leq s\leq S$. Initially, we have $f_{0,0}=1$. \\
+
+  For a given element $a_i$, we may choose to ignore the element or add it to the sum. In the former case, this can be done via all the subsets that either include index $i$ or do not include index $i$; in the latter case, the subset must include index $i$. This is captured via the transitions
+  \BE{
+    f_{k,s}=\BC{
+      2f_{k-1,s} & \text{if }s<a_k \\
+      2f_{k-1,s}+f_{k-1,s-a_k} & \text{otherwise}.
+    }
+  }
+  Because there are $O(nS)$ states, and each transition has a constant number of arithmetic operations, this runs in the desired $O(nS)$ time.
+\end{document}

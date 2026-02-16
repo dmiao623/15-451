@@ -1,0 +1,44 @@
+\documentclass{article}
+\input{preamble}
+
+\begin{document}
+\maketitle
+  
+\ZS{Problem 3}
+  We call such a sequence $a_1,\dots,a_n\in\bbZ^d$ $\pi$-coverable for a permutation $\pi$ of $1,\dots,d$, if the following algorithm returns \texttt{true}: \\
+
+  \textbf{Algorithm 1}: Let $k:=1$, $s_1,\dots,s_n:=\infty$. For $i:=1,\dots,n$, if there exists $1\leq j<k$ s.t. $s_{\pi_j}=a_{i,\pi_j}$, then we continue; otherwise, if $k>d$, we return \texttt{false}, otherwise we set $s_{\pi_k}:=a_{i,\pi_k}$ and increment $k:=k+1$. The algorithm returns \texttt{true} if the outer loop terminates. Note that this algorithm is straightforward to generalize to any partial permutation $\rho$. \\
+
+  \textbf{Lemma 1}: A sequence $a_1,\dots,a_n$ is coverable iff it is $\pi$-coverable for some $\pi\in \text{permutations}(1,\dots,d)$.\\
+  \textbf{Proof}:
+  \BI{
+    \item ($\leftarrow$): Let $\pi$ be some permutation for which the algorithm returns \texttt{true}. Consider the terminating values of $k$ and $s_1,\dots,s_d$ for such a $\pi$. It is clear that for each $i=1,\dots,n$, there exists some $1\leq j<k$ s.t. $s_{x}=a_{i,x}$ for $x=p_j$. Thus, $s$ is a covering sequence of $a$.
+    \item ($\rightarrow$): Let $t$ be a covering sequence of $a$. We construct a $\pi$ s.t. $a$ is $\pi$-coverable by repeating the following process: let $i$ be the index of the first uncovered point; since $t$ covers $a_i$, there exists $1\leq j\leq d$ s.t. $t_j=a_{i,j}$. We append such a $j$ to $\pi$, and mark every point $\ell$ s.t. $t_j=a_{\ell,j}$ as covered. This is the exact reverse process as the forward algorithm, so it yields $\pi$ s.t. $a$ is $\pi$-coverable. \\
+  }
+
+  Let $f_{i,\rho}$ for $1\leq i\leq n$ and $\rho$ a partial permutation of $1,\dots,d$ be the maximum index $i\leq j\leq n$ s.t. the subsequence $a_i,\dots,a_j$ is $\rho$-coverable. The base case of the recurrence is given by $f_{i,\eset}=i-1$ for all $1\leq i\leq n$ (corresponding to a degenerate interval). \\
+
+  Suppose that $\bab{\rho}=m$. Let $j^*$ be the minimum index in $1,\dots,m$ s.t. 
+  \BE{
+    a_{\bpa{f_{i+1,\overline{\rho_2\cdots\rho_{j^*}}}}+1,\rho_1}=a_{i,\rho_1}.
+  }
+  If such a $j^*$ exists, then let $\psi=\overline{\rho_2\cdots\rho_{j^*}\rho_1\rho_{j^*+1}\cdots\rho_m}$. We have that $f_{i,\rho}=f_{i+1,\psi}$. Otherwise, $f_{i,\rho}=f_{i+1,\overline{\rho_2\cdots\rho_m}}$. Evaluating in reverse order from $n$ to $1$, we have a recurrence for $f$. \\
+
+  To motivate this solution, we first note that $f_{i,\rho}$ is equivalent to running Algorithm 1 with fixed permutation $\rho$ from index $i$ in $a$. Thus, we must have that $s_{\rho_1}=a_{i,\rho_1}$. The formula above finds some partial permutation $\psi$ s.t. Algorithm 1, when starting from index $i+1$, will generate the same solution. We do this by identifying the minimum prefix of $\overline{\rho_2\cdots\rho_m}$; if the first index that cannot be covered (index $f_{i+1,\overline{\rho_2\cdots\rho_j}}+1$) has $\rho_1$-th index equivalent to the $\rho_1$-th index at $a_1$, then for the current index, it can be matched at dimension $\rho_1$; hence, this is equivalent to $f_{i+1,\psi}$, as defined above. If no such index exists, then index $\rho_1$ is never ``useful'' outside of index $a_i$, so the answer is $f_{i+1,\overline{\rho_2\cdots\rho_m}}$. \\
+
+
+  Then, the answer is given by
+  \BE{
+    \sum_{i=1}^n \bpa{\max_{\pi\in\text{permutations}(1,\dots,d)} f_{i,\pi}}-i+1.
+  }
+
+  To show that this is correct, we introduce the following lemma. \\
+
+  \textbf{Lemma 2}: If a sequence $a_1,\dots,a_n$ is coverable, then the sequence $a_1,\dots,a_{n-1}$ is coverable. \\
+  \textbf{Proof}: Trivial. \\
+
+  Thus, for each position $i$, finding the maximum $i\leq j\leq n$ s.t. the subinterval from $i$ to $j$ is coverable necessarily shows the existence of $j-i+1$ subintervals that have left boundary at $i$ and are coverable. For such a maximal $j$, by Lemma 1 there exists some permutation $\pi$ s.t. the subinterval is $\pi$-coverable; enumerating over all $\pi$ is thus sufficient to identify the maximum. \\
+
+  There are $O(d!)$ partial permutations, yielding $O(nd!)$ states. The transitions have a complexity bounded by $O(d)$, giving a total complexity of $O(nd!d)$.
+  
+\end{document}

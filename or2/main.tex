@@ -1,0 +1,37 @@
+\documentclass{article}
+\input{preamble}
+
+\begin{document}
+\maketitle
+  
+\ZS{Problem 2}
+  Consider a data structure that supports the following range operations on tuples $(a_i,b_i)$ for $i=1,\dots,n$:
+  \BI{
+    \item $\texttt{set}(k,x,y)$ ($1\leq k\leq n$): update $(a_k,b_k):=(x,y)$.
+    \item $\texttt{update}(l,r,x)$ ($1\leq l\leq r\leq n$): update $a_i:=a_i+x$ for all $l\leq i\leq r$.
+    \item $\texttt{query\_ab}(l,r)$ ($1\leq l\leq r\leq n$): return $\sum_{i=l}^r a_i\cdot b_i$.
+     \item $\texttt{query\_b}(l,r)$ ($1\leq l\leq r\leq n$): return $\sum_{i=l}^r b_i$.
+  }
+  This can be implemented using segment trees with lazy propagation. Specifically, in each node $u$, we maintain the sum $p_u:=\sum_{i\in L_u} b_i$ and $q_u:=\sum_{i\in L_u} a_i\cdot b_i$, where $L_u$ represents the leaves of the subtree of $u$. To process lazy push-down update $r_u$ from $\texttt{update}$ operation(s), we simply increment $q_u:=q_u+p_u\cdot r_u$ and reset $r_u:= 0$. Point-set operations can be processed by recursing down the tree while pushing-down all lazy updates, and recomputing each $p_u$ and $q_u$ in postorder. \\
+
+  % Consider the original problem now. First, we discretize $a$ so that the values are in the range $[0,n)$. We aim to maintain a data structure s.t. at each index $k$, we can query the number of ``intervals'' in previous indices $(a_i,a_j)$ s.t. $a_k\in(a_i,a_j)$ and $i<j$. Such queries can be maintained by having $+1$ at every interval left boundary, a $-1$ at every interval right boundary, and doing a range prefix-sum query.
+Solution sketch: consider enumerating through all $k$ and determining the number of compatible $(i,j)$ pairs. Each pair corresponds to an interval, which motivates point-query interval-update. This reduces to point-update interval-query using prefix sums.\\
+
+Using the segment tree above, we ``activate'' indices one-by-one (by setting the corresponding $b_i$ to $1$). At index $k$ we activate $k$ using a \texttt{set} operation. To update all previous indices (ones with $a_i<a_j$), we perform a lazy update operation on $[0,a_j]$. The pseudocode is as follows:
+
+\begin{verbatim}
+
+discretize a
+initialize st w/ (0, 0) * n
+
+let r := 0
+for i := 1...n:
+  let x := a[i]
+  r := r + query_ab(0, x)
+  update(0, x, 1)
+  set(x, -query_b(0, x), 1)
+return r
+\end{verbatim}
+
+
+\end{document}
