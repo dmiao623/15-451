@@ -1,0 +1,45 @@
+\documentclass{article}
+\input{preamble}
+
+\begin{document}
+\maketitle
+
+\ZS{Task 1}
+  \BV{
+    \item
+      \textbf{Lemma} (Cut Property): For a minimum spanning tree $M$ and an edge $c\in M$ with weight $k$, let $A,B$ be the two vertex-components connected by $e$ in $M$. Then all edges $e=(u,v)$ with $u\in A,v\in B$ satisfy $w(e)\geq k$. \\
+
+      \textit{Proof}: AFSOC otherwise. Then there exists some edge $e=(u,v)$ s.t. $u\in A,v\in B$ with $w(e)<k$. Define $T=M\setminus c\cup \{e\}$. Clearly $T$ is a spanning tree and has weight $w(m)-k+w$ which is less than $w(M)$, contradicting the minimality of $M$. \\
+
+      For a minimum spanning tree $M$, let $e\in M$ be an arbitrary edge. By the Cut Property, any spanning tree must contain an edge across the cut induced by $e$ in $M$ with weight at least $w(e)$. It follows that the bottleneck cost of any spanning tree must be at least that of the bottleneck cost of $M$.
+
+    \item
+      Let $G$ be a graph with vertices $\bbr{A,B,C}$ and edge weights $w(A,B)=1,w(B,C)=2,w(A,C)=2$. Then, the spanning tree consisting of edges $\{(A,C),(B,C)\}$ minimizes the bottleneck cost of $2$ while having a suboptimal total weight of $4$.
+  }
+
+\ZS{Task 2}
+  Consider a graph with $V=F\cup B\cup P\cup\bbr{s,t}$, where $F$, $B$, and $P$ represent the set of foxes, burrows, and phones, respectively, and $s$ and $t$ represent a super-source and a super-sink, respectively. For all $f\in F$, $b\in B$, $p\in P$, create edges
+  \BI{
+  \item $(s,b)$ with capacity $(0,1)$.
+  \item $(s,p)$ with capacity $(0,1)$.
+  \item $(f,t)$ with capacity $(2,2)$.
+  \item $(b',f)$ with capacity $(0,1)$ for all $b'$ that fox $f$ can use.
+  \item $(p',f)$ with capacity $(0,1)$ for all $p'$ that fox $f$ can use.
+  }
+  Here, capacity $(l,r)$ denotes the inclusive lower- and upper-bound on flows. The problem reduces to finding the maximum amount of flow $f$ that respects all flow constraints. The answer will be $f/2$. This can be solved by iterating from $0$ to $2n$ and checking with Ford-Fulkerson. This takes $O(n^4)$ time because Ford-Fulkerson runs in $O(n^3)$ time.
+
+\ZS{Task 3}
+  For all nodes $u$, let $d_u$ denote the distance from node $1$ to node $u$. This can be computed using Dijkstra's algorithm in $O(m\log n)$ time. \\
+
+  Then, we iterate $i$ from $1$ to $m$ while maintaining a union-find data structure. The union-find stores values from $1$ to $n$ and is augmented to store the minimum $d_i$ for all $i$ in a component. Then,
+  \BI{
+  \item
+      The cost for $x_i$ can be determined by querying the minimum value in the union find component containing $x_i$.
+    \item
+      Then, update the union-find by merging components $u_i$ and $v_i$, where $u_i$ and $v_i$ are the endpoints of the $i$-th edge.
+  }
+  This is correct because at the $i$-th timestep, any vertex in $x_i$'s union-find component can be reached with zero-cost. Taking the minimum distance to node $1$ then gives the minimum total distance. \\
+
+  Each union-find update and query takes amortized $O(\log n)$ time. This makes the algorithm run in $O(m\log n)$ time in total, with the Dijkstra's algorithm precomputation.
+  
+\end{document}
