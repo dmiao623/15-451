@@ -1,0 +1,37 @@
+\documentclass{article}
+\input{preamble}
+
+\begin{document}
+\maketitle
+
+\ZS{Task 1}
+  Let $f_i$ denote the maximum reward to land on index $i$. Initially, $f_1:= r_1$. The transitions are given by
+  \BE{
+    f_i=r_i+\max_{j\in [i-d_\text{max},i-d_\text{min}]\cap [1,n]} f_j
+  }
+  for all $i\in (1,n]$. If the range is empty, define $f_i=\infty$. This reduces the problem to monotone range minimum query, because the interval sizes are fixed, so it can be solved in $O(n)$ time.
+
+\ZS{Task 2}
+  We augment the data structure by tracking the elements in each equivalence class for each component. These can be stored in the root for each union-find component. Formally, for each node $u$ for which it is a root, we can track $a_u$ and $b_u$ ($a_u+b_u=\text{size}(u)$), which are the number of truth-tellers and liars in some order. Then, the final answer at each step is given by
+  \BE{
+    S:=\sum_{u:u\text{ is a root}} \f{a_u(a_u-1)}{2} + \f{b_u(b_u-1)}{2}
+  }
+  Initially, $S=0$ and $a_i=1,b_i=0$ for all $1\leq i\leq n$. Because each operation only modifies at most two roots, this sum can be maintained by subtracting and adding the appropriate amounts before and after each update to the union-find.\\
+
+  For an update when merging root $v$ into root $u$, we assign $a_u:= a_u+a_v$ and $b_u:=b_u+b_v$ if the two roots are the same, or $a_u:= a_u+b_v$ and $b_u:=b_u+a_v$ if they are different (this can be derived from the update information and the relation of the update nodes to the root). Using standard small-to-large merging, this takes $O(\log n)$ time per operation.
+
+\ZS{Task 3}
+  We first compute a binary-lift table. Let $d_{k,i}=f^(2^k)(i)$ for $0\leq k\leq \bcl{\log n}$ and $1\leq i\leq n$. This can be computed in $O(n\log n)$ time via the recurrence
+  \BA{
+    d_{0,i}&=f(i)\\
+    d_{k,i}&=d_{k-1,(d_{k-1,i})}\text{ for $k\geq 1$}
+  }
+  For each index $i$, we can then compute $k(i)$ in $O(\log n)$ time via the following greedy algorithm:
+  \BI{
+    \item Let $x=i$ and $r=0$ initially. Iterate from $j:=\bcl{\log n}\to 1$. For each $j$, if $d_{j,x}$ does not complete the cycle, then set $x:= d_{j,x}$ and $r:=r+2^j$. Then, $k(i)=r+1$. 
+  }
+  This algorithm is correct because we iteratively construct the binary representation of $k(i)-1$ by greedily taking the largest step that does not overshoot the target. One additional step is needed at the end to actually complete the cycle. Correctness is guaranteed by the monotonicity constraint. 
+
+  Building the table takes $O(n\log n)$ time, and computing each $k(i)$ takes $O(\log n)$ time, so the whole algorithm runs in $O(n\log n)$ as desired.
+  
+\end{document}
